@@ -1,0 +1,3 @@
+[submodule "submodules/opentelemetry-proto"]
+	path = submodules/opentelemetry-proto
+	url = https://github.com/open-telemetry/opentelemetry-proto.git

@@ -25,7 +25,7 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
     private readonly ConcurrentDictionary<ActivitySpanId, Activity> activeActivities;
     private readonly ConcurrentQueue<KeyValuePair<ActivitySpanId, Activity>> endedActivities;
 
-    public CustomProcessor(
+    public PartialSpanProcessor(
         BaseExporter<T> exporter, // TODO: It doesn't seem that we need that.
         BaseExporter<LogRecord> logExporter,
         int scheduledDelayMilliseconds = DefaultScheduledDelayMilliseconds,
@@ -40,16 +40,19 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
         this.exporterThread = new Thread(this.ExporterProc)
         {
             IsBackground = true,
-            Name = $"OpenTelemetry-{nameof(CustomProcessor<T>)}-{exporter.GetType().Name}",
+            Name = $"OpenTelemetry-{nameof(PartialSpanProcessor<T>)}-{exporter.GetType().Name}",
         };
-        this.exporterThread.Start();
+        // this.exporterThread.Start();
+
+        this.activeActivities = new ConcurrentDictionary<ActivitySpanId, Activity>();
+        this.endedActivities = new ConcurrentQueue<KeyValuePair<ActivitySpanId, Activity>>();
     }
 
     public override void OnStart(T data)
     {
         if (data is Activity activity)
         {
-            Console.WriteLine("x: CustomProcessor.OnStart - " + activity.DisplayName);
+            Console.WriteLine("x: PartialSpanProcessor.OnStart - " + activity.DisplayName);
         }
     }
 
@@ -57,9 +60,9 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
     {
         if (data is Activity activity)
         {
-            Console.WriteLine("x: CustomProcessor.OnEnd - " + activity.DisplayName);
+            Console.WriteLine("x: PartialSpanProcessor.OnEnd - " + activity.DisplayName);
         }
-        this.OnExport(data);
+        // this.OnExport(data);
     }
 
     private void OnExport(T data)
@@ -101,37 +104,37 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
             this.activeActivities.TryRemove(activity.Key, out _);
         }
 
-        foreach (var keyValuePair in this.activeActivities)
-        {
-            LogRecord logRecord =
-                GetLogRecord(keyValuePair.Value, this.GetHeartbeatLogRecordAttributes());
-            this.logExporter.Export(new Batch<LogRecord>(logRecord));
-        }
+        // foreach (var keyValuePair in this.activeActivities)
+        // {
+        //     LogRecord logRecord =
+        //         GetLogRecord(keyValuePair.Value, this.GetHeartbeatLogRecordAttributes());
+        //     this.logExporter.Export(new Batch<LogRecord>(logRecord));
+        // }
     }
     
-    private static LogRecord GetLogRecord(
-        Activity data,
-        List<KeyValuePair<string, object?>> logRecordAttributesToBeAdded)
-    {
-        byte[] buffer = new byte[750000];
-        var sdkLimitOptions = new SdkLimitOptions();
-        int writePosition = ProtobufOtlpTraceSerializer
-            .WriteTraceData(ref buffer, 0, sdkLimitOptions, null, new Batch<Activity>(data));
-
-        var logRecord = new LogRecord
-        {
-            Timestamp = DateTime.UtcNow,
-            TraceId = data.TraceId,
-            SpanId = data.SpanId,
-            TraceFlags = ActivityTraceFlags.None,
-            Severity = LogRecordSeverity.Info,
-            SeverityText = "Info",
-            Body = Convert.ToBase64String(buffer, 0, writePosition),
-        };
-        var logRecordAttributes = GetLogRecordAttributes();
-        logRecordAttributes.AddRange(logRecordAttributesToBeAdded);
-        logRecord.Attributes = logRecordAttributes;
-
-        return logRecord;
-    }
+    // private static LogRecord GetLogRecord(
+    //     Activity data,
+    //     List<KeyValuePair<string, object?>> logRecordAttributesToBeAdded)
+    // {
+    //     byte[] buffer = new byte[750000];
+    //     var sdkLimitOptions = new SdkLimitOptions();
+    //     int writePosition = ProtobufOtlpTraceSerializer
+    //         .WriteTraceData(ref buffer, 0, sdkLimitOptions, null, new Batch<Activity>(data));
+    //
+    //     var logRecord = new LogRecord
+    //     {
+    //         Timestamp = DateTime.UtcNow,
+    //         TraceId = data.TraceId,
+    //         SpanId = data.SpanId,
+    //         TraceFlags = ActivityTraceFlags.None,
+    //         Severity = LogRecordSeverity.Info,
+    //         SeverityText = "Info",
+    //         Body = Convert.ToBase64String(buffer, 0, writePosition),
+    //     };
+    //     var logRecordAttributes = GetLogRecordAttributes();
+    //     logRecordAttributes.AddRange(logRecordAttributesToBeAdded);
+    //     logRecord.Attributes = logRecordAttributes;
+    //
+    //     return logRecord;
+    // }
 }
