@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--    <PackageReference Include="OpenTelemetry" Version="1.10.0" />-->
+    <!--    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />-->
+    <!--    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />-->
+    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry/OpenTelemetry.csproj" />
+    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry.Exporter.Console/OpenTelemetry.Exporter.Console.csproj" />
+    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/OpenTelemetry.Exporter.OpenTelemetryProtocol.csproj" />
+  </ItemGroup>
+
+</Project>
