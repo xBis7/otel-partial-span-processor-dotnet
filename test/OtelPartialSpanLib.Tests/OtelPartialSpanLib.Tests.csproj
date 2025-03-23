@@ -1,34 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Unit test project for OtelPartialSpanLib</Description>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-<!--  Add something like this to the .sln-->
-<!--  Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtelPartialSpanLib.Tests", "test\OtelPartialSpanLib.Tests\OtelPartialSpanLib.Tests.csproj", "{CC62B3C1-5875-4986-A7F6-C4B26E42B0A1}"-->
-<!--  EndProject-->
   <ItemGroup>
-    <PackageReference Include="Grpc.Tools" Version="2.59.0" PrivateAssets="All">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Google.Protobuf" Version="3.22.5" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
-
-    <PackageReference Include="OpenTelemetry" Version="1.10.0" />
-    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />
-    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
-
-    <ProjectReference Include="$(RepoRoot)\src\OtelPartialSpanLib\OtelPartialSpanLib.csproj" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

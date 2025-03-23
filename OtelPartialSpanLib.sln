@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtelPartialSpanLib", "src\OtelPartialSpanLib\OtelPartialSpanLib.csproj", "{9FB640BA-1411-4027-8A42-3A9032252289}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1B4819E9-E707-4538-BBA5-1D7F0EF5513A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtelPartialSpanLib.Tests", "test\OtelPartialSpanLib.Tests\OtelPartialSpanLib.Tests.csproj", "{A6DDE118-CABD-48F4-B77E-7BA79661FF3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{9FB640BA-1411-4027-8A42-3A9032252289}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FB640BA-1411-4027-8A42-3A9032252289}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FB640BA-1411-4027-8A42-3A9032252289}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6DDE118-CABD-48F4-B77E-7BA79661FF3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6DDE118-CABD-48F4-B77E-7BA79661FF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6DDE118-CABD-48F4-B77E-7BA79661FF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6DDE118-CABD-48F4-B77E-7BA79661FF3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A6DDE118-CABD-48F4-B77E-7BA79661FF3D} = {1B4819E9-E707-4538-BBA5-1D7F0EF5513A}
 	EndGlobalSection
 EndGlobal
