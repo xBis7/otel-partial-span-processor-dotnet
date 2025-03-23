@@ -118,7 +118,7 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
     private void LogOtlpBytesAsALogRecord(Activity data)
     {
         var otlpBytes = PartialSpanUtils.ConvertActivityToOtlpBytes(data);
-        var base64Trace = Convert.ToBase64String(otlpBytes);
+        var base64Trace = PartialSpanUtils.ConvertBytesToHexString(otlpBytes);
 
         // TODO: it might be better to set these attributes on the activity.
         //  This is setting the attributes on the LogRecord.

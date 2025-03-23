@@ -8,6 +8,11 @@ namespace OtelPartialSpanLib;
 
 public static class PartialSpanUtils
 {
+    internal static string ConvertBytesToHexString(byte[] bytes)
+    {
+        return Convert.ToBase64String(bytes);
+    }
+
     internal static byte[] ConvertActivityToOtlpBytes(Activity activity)
     {
         /*
