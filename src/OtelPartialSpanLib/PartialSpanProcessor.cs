@@ -1,38 +1,35 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using OpenTelemetry;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Exporter.OpenTelemetryProtocol.Implementation.Serializer;
-using OpenTelemetry.Exporter.OpenTelemetryProtocol.Implementation;
+using Microsoft.Extensions.Logging;
 
 namespace OtelPartialSpanLib;
 
 public class PartialSpanProcessor<T> : BaseProcessor<T>
     where T : class
 {
-    
-    internal const int DefaultScheduledDelayMilliseconds = 5000;
-    internal const int DefaultExporterTimeoutMilliseconds = 30000;
+    private const int DefaultScheduledDelayMilliseconds = 5000;
+    private const int DefaultExporterTimeoutMilliseconds = 30000;
 
-    internal readonly int ScheduledDelayMilliseconds;
+    private readonly int ScheduledDelayMilliseconds;
 
     private readonly Thread exporterThread;
     private readonly AutoResetEvent exportTrigger = new(false);
     private readonly ManualResetEvent dataExportedNotification = new(false);
     private readonly ManualResetEvent shutdownTrigger = new(false);
 
-    private readonly BaseExporter<LogRecord> logExporter;
     private readonly ConcurrentDictionary<ActivitySpanId, Activity> activeActivities;
     private readonly ConcurrentQueue<KeyValuePair<ActivitySpanId, Activity>> endedActivities;
+    
+    private readonly ILogger<T> _logger;
 
     public PartialSpanProcessor(
-        BaseExporter<T> exporter, // TODO: It doesn't seem that we need that.
-        BaseExporter<LogRecord> logExporter,
+        ILogger<T> logger,
         int scheduledDelayMilliseconds = DefaultScheduledDelayMilliseconds,
-        int exporterTimeoutMilliseconds = DefaultExporterTimeoutMilliseconds)
+        int exporterTimeoutMilliseconds = DefaultExporterTimeoutMilliseconds) // TODO: we don't need this.
     {
-        this.logExporter = logExporter;
-        // TODO: check if out of ranger.
+        this._logger = logger;
+        // TODO: check if out of range.
         // Guard.ThrowIfOutOfRange(scheduledDelayMilliseconds, min: 1);
         // Guard.ThrowIfOutOfRange(exporterTimeoutMilliseconds, min: 0);
         this.ScheduledDelayMilliseconds = scheduledDelayMilliseconds;
@@ -40,9 +37,9 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
         this.exporterThread = new Thread(this.ExporterProc)
         {
             IsBackground = true,
-            Name = $"OpenTelemetry-{nameof(PartialSpanProcessor<T>)}-{exporter.GetType().Name}",
+            Name = $"OpenTelemetry-{nameof(PartialSpanProcessor<T>)}-ILogger",
         };
-        // this.exporterThread.Start();
+        this.exporterThread.Start();
 
         this.activeActivities = new ConcurrentDictionary<ActivitySpanId, Activity>();
         this.endedActivities = new ConcurrentQueue<KeyValuePair<ActivitySpanId, Activity>>();
@@ -50,19 +47,27 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
 
     public override void OnStart(T data)
     {
-        if (data is Activity activity)
-        {
-            Console.WriteLine("x: PartialSpanProcessor.OnStart - " + activity.DisplayName);
-        }
+        if (data is not Activity activity) return;
+
+        _logger.LogDebug("PartialSpanProcessor.OnStart - " + activity.DisplayName);
+        activeActivities.TryAdd(activity.SpanId, activity);
     }
 
     public override void OnEnd(T data)
     {
-        if (data is Activity activity)
-        {
-            Console.WriteLine("x: PartialSpanProcessor.OnEnd - " + activity.DisplayName);
-        }
-        // this.OnExport(data);
+        if (data is not Activity activity) return;
+
+        // this.TryExport(data);
+        //
+        // var logRecordAttributes = new List<KeyValuePair<string, object?>>
+        // {
+        //     new("partial.event", "stop"),
+        // };
+        // var logRecord = GetLogRecord(data, logRecordAttributes);
+        // this.logExporter.Export(new Batch<LogRecord>(logRecord));
+
+        _logger.LogDebug("PartialSpanProcessor.OnEnd - " + activity.DisplayName);
+        endedActivities.Enqueue(new KeyValuePair<ActivitySpanId, Activity>(activity.SpanId, activity));
     }
 
     private void OnExport(T data)
@@ -98,43 +103,34 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
 
     private void Heartbeat()
     {
-        // remove ended activities from active activities
-        while (this.endedActivities.TryDequeue(out var activity))
+        // If it can be dequeued then it also needs to be removed from the active activities.
+        while (endedActivities.TryDequeue(out var activity))
         {
-            this.activeActivities.TryRemove(activity.Key, out _);
+            activeActivities.TryRemove(activity.Key, out _);
         }
 
-        // foreach (var keyValuePair in this.activeActivities)
-        // {
-        //     LogRecord logRecord =
-        //         GetLogRecord(keyValuePair.Value, this.GetHeartbeatLogRecordAttributes());
-        //     this.logExporter.Export(new Batch<LogRecord>(logRecord));
-        // }
+        foreach (var keyValuePair in activeActivities)
+        {
+            LogOtlpBytesAsALogRecord(keyValuePair.Value);
+        }
     }
     
-    // private static LogRecord GetLogRecord(
-    //     Activity data,
-    //     List<KeyValuePair<string, object?>> logRecordAttributesToBeAdded)
-    // {
-    //     byte[] buffer = new byte[750000];
-    //     var sdkLimitOptions = new SdkLimitOptions();
-    //     int writePosition = ProtobufOtlpTraceSerializer
-    //         .WriteTraceData(ref buffer, 0, sdkLimitOptions, null, new Batch<Activity>(data));
-    //
-    //     var logRecord = new LogRecord
-    //     {
-    //         Timestamp = DateTime.UtcNow,
-    //         TraceId = data.TraceId,
-    //         SpanId = data.SpanId,
-    //         TraceFlags = ActivityTraceFlags.None,
-    //         Severity = LogRecordSeverity.Info,
-    //         SeverityText = "Info",
-    //         Body = Convert.ToBase64String(buffer, 0, writePosition),
-    //     };
-    //     var logRecordAttributes = GetLogRecordAttributes();
-    //     logRecordAttributes.AddRange(logRecordAttributesToBeAdded);
-    //     logRecord.Attributes = logRecordAttributes;
-    //
-    //     return logRecord;
-    // }
+    private void LogOtlpBytesAsALogRecord(Activity data)
+    {
+        var otlpBytes = PartialSpanUtils.ConvertActivityToOtlpBytes(data);
+        var base64Trace = Convert.ToBase64String(otlpBytes);
+
+        // TODO: it might be better to set these attributes on the activity.
+        //  This is setting the attributes on the LogRecord.
+        //  It depends on how the collector is handling them.
+        using (_logger.BeginScope(new Dictionary<string, object>
+               {
+                   ["span.type"] = "partial",
+                   ["partial.event"] = "heartbeat",
+                   ["partial.frequency"] = ScheduledDelayMilliseconds + "ms"
+               }))
+        {
+            _logger.LogInformation(base64Trace);
+        }
+    }
 }

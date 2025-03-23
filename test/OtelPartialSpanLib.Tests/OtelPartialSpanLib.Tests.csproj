@@ -1,13 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Unit test project for OtelPartialSpanLib</Description>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+<!--  Add something like this to the .sln-->
+<!--  Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtelPartialSpanLib.Tests", "test\OtelPartialSpanLib.Tests\OtelPartialSpanLib.Tests.csproj", "{CC62B3C1-5875-4986-A7F6-C4B26E42B0A1}"-->
+<!--  EndProject-->
   <ItemGroup>
-    <!-- For Protobuf code generation -->
     <PackageReference Include="Grpc.Tools" Version="2.59.0" PrivateAssets="All">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -19,18 +22,13 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
 
-<!--    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry/OpenTelemetry.csproj" />-->
-<!--    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry.Exporter.Console/OpenTelemetry.Exporter.Console.csproj" />-->
-<!--    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/OpenTelemetry.Exporter.OpenTelemetryProtocol.csproj" />-->
+    <ProjectReference Include="$(RepoRoot)\src\OtelPartialSpanLib\OtelPartialSpanLib.csproj" />
   </ItemGroup>
 
-  <!-- Include the .proto files from the submodule -->
   <ItemGroup>
-    <!-- referencing all .proto files in the trace/v1 folder -->
-    <!-- GrpcServices="None", means to generate only Protobuf messages and no gRPC stubs. -->
-    <Protobuf Include="../../submodules/opentelemetry-proto/opentelemetry/proto/**/*.proto"
-              GrpcServices="None"
-              ProtoRoot="../../submodules/opentelemetry-proto" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
