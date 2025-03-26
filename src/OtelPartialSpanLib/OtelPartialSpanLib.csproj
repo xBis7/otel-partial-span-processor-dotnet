@@ -20,6 +20,10 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />
     <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.10.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
+    <ProjectReference Include="../../submodules/OpenTelemetry.Exporter.OpenTelemetryProtocol/OpenTelemetry.Exporter.OpenTelemetryProtocol.csproj" />
+    <ProjectReference Include="../../submodules/OpenTelemetry/OpenTelemetry.csproj" />
+    <ProjectReference Include="../../submodules/OpenTelemetry.Api.ProviderBuilderExtensions/OpenTelemetry.Api.ProviderBuilderExtensions.csproj" />
+    <ProjectReference Include="../../submodules/OpenTelemetry.Api/OpenTelemetry.Api.csproj" />
 
 <!--    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry/OpenTelemetry.csproj" />-->
 <!--    <ProjectReference Include="../../../opentelemetry-dotnet/src/OpenTelemetry.Exporter.Console/OpenTelemetry.Exporter.Console.csproj" />-->

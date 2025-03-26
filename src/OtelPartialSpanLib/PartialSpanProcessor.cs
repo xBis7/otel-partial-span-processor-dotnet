@@ -111,6 +111,10 @@ public class PartialSpanProcessor<T> : BaseProcessor<T>
 
         foreach (var keyValuePair in activeActivities)
         {
+            // byte[] buffer = new byte[750000];
+            // var sdkLimitOptions = new SdkLimitOptions();
+            // int writePosition = ProtobufOtlpTraceSerializer
+                // .WriteTraceData(ref buffer, 0, sdkLimitOptions, null, new Batch<Activity>(data));
             LogOtlpBytesAsALogRecord(keyValuePair.Value);
         }
     }
