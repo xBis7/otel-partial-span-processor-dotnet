@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(TargetFrameworksForLibrariesExtended)</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
+<!--    <TargetFrameworks>$(TargetFrameworksForLibrariesExtended)</TargetFrameworks>-->
     <Description>OpenTelemetry protocol exporter for OpenTelemetry .NET</Description>
-    <PackageTags>$(PackageTags);OTLP</PackageTags>
+<!--    <PackageTags>$(PackageTags);OTLP</PackageTags>-->
     <MinVerTagPrefix>core-</MinVerTagPrefix>
 
-    <DefineConstants>BUILDING_INTERNAL_PERSISTENT_STORAGE;$(DefineConstants)</DefineConstants>
+<!--    <DefineConstants>BUILDING_INTERNAL_PERSISTENT_STORAGE;$(DefineConstants)</DefineConstants>-->
+    <DefineConstants>BUILDING_INTERNAL_PERSISTENT_STORAGE;</DefineConstants>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
 
     <!-- Note: SYSLIB1100;SYSLIB1101 - Configuration.Binder: Can't create
@@ -15,26 +17,30 @@
     in the future (hopefully .NET 9) see:
     https://github.com/open-telemetry/opentelemetry-dotnet/pull/5520#discussion_r1556221048
     and https://github.com/dotnet/runtime/issues/92509 -->
-    <NoWarn>$(NoWarn);SYSLIB1100;SYSLIB1101</NoWarn>
-    <AllowUnsafeBlocks Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'">true</AllowUnsafeBlocks>
+<!--    <NoWarn>$(NoWarn);SYSLIB1100;SYSLIB1101</NoWarn>-->
+    <NoWarn>SYSLIB1100;SYSLIB1101</NoWarn>
+<!--    <AllowUnsafeBlocks Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'">true</AllowUnsafeBlocks>-->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(RepoRoot)\src\OpenTelemetry\OpenTelemetry.csproj" />
+    <ProjectReference Include="..\..\submodules\OpenTelemetry\OpenTelemetry.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Core" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'" />
+<!--    <PackageReference Include="Grpc.Core" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'" />-->
+    <PackageReference Include="Grpc.Core" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'" />
+<!--    <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == '$(NetFrameworkMinimumSupportedVersion)'" />-->
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="$(RepoRoot)\src\Shared\PeriodicExportingMetricReaderHelper.cs" Link="Includes\PeriodicExportingMetricReaderHelper.cs" />
-    <Compile Include="$(RepoRoot)\src\Shared\TagWriter\ArrayTagWriter.cs" Link="Includes\TagWriter\ArrayTagWriter.cs" />
-    <Compile Include="$(RepoRoot)\src\Shared\TagWriter\TagWriter.cs" Link="Includes\TagWriter\TagWriter.cs" />
+    <Compile Include="..\..\submodules\Shared\PeriodicExportingMetricReaderHelper.cs" Link="Includes\PeriodicExportingMetricReaderHelper.cs" />
+    <Compile Include="..\..\submodules\Shared\TagWriter\ArrayTagWriter.cs" Link="Includes\TagWriter\ArrayTagWriter.cs" />
+    <Compile Include="..\..\submodules\Shared\TagWriter\TagWriter.cs" Link="Includes\TagWriter\TagWriter.cs" />
   </ItemGroup>
 
 </Project>
